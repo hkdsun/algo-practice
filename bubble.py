@@ -108,4 +108,4 @@ def quicksort(nums):
 
 
 n = [1, 5, 2, 25, 35, 3, 12, 30]
-print quicksort(n)
+print insertion(n)
