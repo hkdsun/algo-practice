@@ -1,4 +1,5 @@
 import copy
+import random
 
 all_moves = {
     'left'  : (0, -1),
@@ -24,7 +25,12 @@ class Board(object):
         return (new_r in range(3) and new_c in range(3))
 
     @staticmethod
-
+    def random(moves=1000):
+        board = Board.encode([1,2,3,4,5,6,7,8,-1])
+        while moves > 0:
+            board = board.move(random.choice(board.get_available_moves()))
+            moves -= 1
+        return board
 
     def hashable_state(self):
         return str(self.state)
@@ -66,28 +72,32 @@ class Board(object):
             new_r, new_c = self.get_empty_rc()
         return legal_moves
 
-def solve_board(queue, moves):
+def solve(board):
+    queue = [board]
     seen = set()
+    parents = {}
     while queue:
         board = queue.pop(0)
-        if board.is_solved():
-            return True
-
         available_moves = board.get_available_moves()
         for direction in available_moves:
             new_board = board.move(direction)
             if (new_board.hashable_state(), direction) not in seen:
-                if new_board.is_solved():
-                    return True
                 queue.append(new_board)
                 seen.add((new_board.hashable_state(), direction))
-    return None
+                parents[new_board] = (board, direction)
+                if new_board.is_solved():
+                    b = new_board
+                    res = []
+                    while b in parents:
+                        res.append(parents[b][1])
+                        b = parents[b][0]
+                    res = res[::-1]
+                    return res
 
-def solve(board):
-    return solve_board([board], [])
 
+board = Board.random()
 
-
-board = Board.encode([1, 5, -1, 8, 2, 4, 6, 7, 3])
+for row in board.state:
+    print ' '.join(map(lambda x: str(x), row))
 
 print solve(board)
